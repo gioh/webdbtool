@@ -1,0 +1,566 @@
+{% extends "layout.html" %}
+{% block page_title %}DBA Admin Manage{% endblock %}
+{% block body %}
+
+
+   <div class="hero-unit">
+      <div class="box" style="margin-top:-50px;">
+     <div class="header">Admin 后台管理</div>
+     </div>
+
+      <!-- <div style="margin-left:0px;margin-top:-50px;background-color:#FFEFA8;color:#844600;"><p>Admin 后台管理 </p></div> -->    
+      <!--#867D6A  -->
+  
+<div id="role_list">
+      <h5>角色显示和添加~</h5>
+      
+
+        <table id="t_role_table" class="table table-hover" style="table-layout:fixed;">
+        
+        <thead>
+          <tr>
+            <th width="60">
+              ID
+            </th>
+            <th>
+              角色名称
+            </th>
+            <th>
+              角色描述
+            </th>
+            <th>
+              角色类型
+            </th>
+            <th>
+              所属项目
+            </th>
+            <th>
+              所属部门
+            </th>
+            <th>
+              角色优先级
+            </th>
+            <th width="150">
+              创建时间
+            </th>
+          </tr>
+        </thead>
+        <tbody id="role_tbody">
+          {% for item in d_role_list %}
+          <tr class="success">
+            <td>
+              {{ item.role_id }}
+            </td>
+            <td>
+              {{ item.role_name_en }}
+            </td>
+            <td>
+              {{ item.role_name_cn }}
+            </td>
+            <td>
+              {{ item.role_type }}
+            </td>
+            <td>
+              {{ item.app_info }}
+            </td>
+            <td>
+              {{ item.plat_info }}
+            </td>
+            <td>
+              {{ item.priority }}
+            </td>
+            <td>
+              {{ item.create_date }}
+            </td>
+          </tr>
+          {% endfor %}
+          
+        </tbody>
+      </table>
+<div id="role_add">
+<form id="add_role_form" method="post">
+                新添加角色:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>角色名称:<input type="text" id="text_role_name" name="text_role_name"  class="select-container-db span2" placeholder=""></input> &nbsp;&nbsp;
+
+                角色描述:<input type="text" id="text_role_desc" name="text_role_desc"  class="select-container-db span2" placeholder=""></input> &nbsp;&nbsp;
+                角色类型:<select id="s_role_type" name="s_role_type"   style='width:150px;z-index:-1' >
+                 <option class="option-item" value="">选择类型</option>
+                 <option class="option-item" value="3">项目角色</option>
+                 <option class="option-item" value="2">部门角色</option>
+                 <option class="option-item" value="1">超级角色</option>
+                 </select>
+                所属项目:<select id="s_belong_app" name="s_belong_app"  class="select-container-app_master span2">
+                 <option class="option-item" value="">选择项目</option>
+                 {% for item in app_list %}
+                    <option class="option-item" value="{{ item.app_id }}">{{ item.app_name }}</option>
+                 {% endfor %}
+                </select>&nbsp;&nbsp;&nbsp;&nbsp;
+                所属部门:
+                <select id="s_product_dept" name="s_product_dept"   style='width:150px;z-index:-1' >
+                 <option class="option-item" value="">选择部门</option>
+                 <option class="option-item" value="10000">数据部</option>
+                 <option class="option-item" value="10001">研发一部</option>
+                 <option class="option-item" value="10002">研发二部</option>
+                 <option class="option-item" value="10003">研发三部</option>
+                 <option class="option-item" value="10004">云服务部</option>
+                 <option class="option-item" value="10005">LITC</option>
+                </select>
+
+                <button id="btn_add_role" type="submit" class="btn btn-primary btn-middle">执行~</button><br><br>
+
+      <legend><large></large></legend>
+
+
+
+                
+        </form>
+      
+   </div>
+   </div>
+
+   <legend><small></small></legend>
+
+
+  
+  <br>
+
+<div id="user_list">
+<h5>用户显示和添加</h5>
+ <table id="t_user_table" class="table table-hover" style="table-layout:fixed;">  
+        <thead>
+          <tr>
+            <th width="60">
+              ID
+            </th>
+            <th width="60">
+              用户名称
+            </th>
+            <th>
+              用户描述
+            </th>
+            <th>
+              部门
+            </th>
+            <th>
+              EMAIL
+            </th>
+            <th>
+              默认角色
+            </th>
+            <th width="150">
+              已有角色
+            </th>
+            <th width="150">
+              创建时间
+            </th>
+          </tr>
+        </thead>
+        <tbody id="user_tbody">
+          {% for item in d_user_list %}
+          <tr class="success">
+            <td>
+              {{ item.user_id }}
+            </td>
+            <td>
+              {{ item.user_name_en }}
+            </td>
+            <td>
+              {{ item.user_name_ch }}
+            </td>        
+            <td>
+              {{ item.dept_name }}
+            </td>
+            <td>
+              {{ item.email }}
+            </td>
+            <td>
+              {{ item.default_role }}
+            </td>
+            <td>
+              {{ item.role_info }}
+            </td>
+            <td>
+              {{ item.create_date }}
+            </td>
+          </tr>
+          {% endfor %}
+          
+        </tbody>
+      </table>
+ <div id="user_add"> 
+<form id="add_user_form" method="post">
+          添加用户:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br>
+                登录用户名:<input type="text" id="text_user_name" name="text_user_name"  class="select-container-user span2"></input> &nbsp;&nbsp;
+
+
+                用户中文名:<input type="text" id="text_user_name_chi" name="text_user_name_chi"  class="select-container-user span2" placeholder=""></input> &nbsp;&nbsp;
+
+                登录密码:<input type="password" id="text_user_pass" name="text_user_pass"  class="select-container-db span2" placeholder=""></input> &nbsp;&nbsp;<br>
+
+                邮箱:<input type="text" id="text_email" name="text_email"  class="select-container-db span2" placeholder=""></input> &nbsp;&nbsp;
+
+                所属部门:
+                <select id="s_product_dept_user" name="s_product_dept_user"   style='width:150px;z-index:-1' >
+                 <option class="option-item" value="">选择部门</option>
+                 <option class="option-item" value="10000">数据部</option>
+                 <option class="option-item" value="10001">研发一部</option>
+                 <option class="option-item" value="10002">研发二部</option>
+                 <option class="option-item" value="10003">研发三部</option>
+                 <option class="option-item" value="10004">云服务部</option>
+                 <option class="option-item" value="10005">LITC</option>
+                </select>
+                默认角色：<select id="s_role_default" name="s_role_default"  class="select-container-user span5">
+                <option class="option-item" value="">选择角色</option>
+                {% for item in s_role_list %}
+                    <option class="option-item" value="{{ item.role_id }}">{{ item.role_name_en }}</option>
+                {% endfor %}
+                </select>
+
+                <br>
+                &nbsp;&nbsp;&nbsp;<button id="btn_user_add" type="submit" class="btn btn-primary btn-middle">添加用户~</button>
+
+                
+
+                
+        </form>
+      
+   </div>
+   </div>
+<div id="d_user_role_rel"> 
+<form id="f_assign_user_role" method="post">
+          分配用户角色:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+                用户名:<input type="text" id="txt_assign_user_name" name="txt_assign_user_name"  class="select-container-user span2"></input> &nbsp;&nbsp;
+                分配角色：<select id="s_assign_user_role" name="s_assign_user_role"  class="select-container-user span5">
+                <option class="option-item" value="">选择角色</option>
+                </select>
+                <br>
+                &nbsp;&nbsp;&nbsp;<button id="btn_assign_user_role" type="submit" class="btn btn-primary btn-middle">分配角色~</button><br>
+  </form>
+  </div>
+    
+    <script type="text/javascript">
+
+      function validate_required(field,alerttxt)
+      {
+      with (field)
+        {
+        if (value==null||value=="")
+          {alert(alerttxt);return false}
+        else {return true}
+        }
+      }
+
+      function validate_value(field,pre_value,alerttxt)
+      {
+      with (field)
+        {
+        if (value==pre_value)
+          {alert(alerttxt);return false}
+        else {return true}
+        }
+      }
+
+    </script>
+
+    <script language="javascript">
+     $(document).ready(function(){
+      $("#s_belong_app").attr("disabled", true); 
+      $("#s_product_dept").attr("disabled", true); 
+      $("#s_role_type").change(function() { 
+        if ($('#s_role_type').val()==3 )
+          {$("#s_belong_app").attr("disabled", false);$("#s_product_dept").attr("disabled", true);}
+        else if($('#s_role_type').val()==2 )
+          {$("#s_belong_app").attr("disabled", true);$("#s_product_dept").attr("disabled", false);}
+        else {$("#s_belong_app").attr("disabled", true);
+              $("#s_product_dept").attr("disabled", true);}
+      }); 
+      }); 
+    </Script>
+
+<script type="text/javascript">
+      function validate_form_role(thisform)
+      {
+      with (thisform)
+        {
+        if (validate_required(text_role_name,'角色名称不能为空')==false) 
+          {text_role_name.focus();return false}
+        else if (validate_required(text_role_desc,"角色描述不能为空!")==false)
+          {text_role_desc.focus();return false}
+        else if (validate_required(s_role_type,"角色类型不能为空!")==false)
+          {s_role_type.focus();return false}
+        else if ($("#s_role_type").val()==3){
+          if (validate_required(s_belong_app,"所属项目不能为空!")==false)
+          {s_belong_app.focus();return false}}
+        else if ($("#s_role_type").val()==2){
+          if (validate_required(s_product_dept,"所属部门不能为空!")==false)
+          {s_product_dept.focus();return false}}
+        else
+          { return true}
+      }
+    }
+</script>
+
+<script type="text/javascript">
+      function validate_form_user(thisform)
+      {
+      with (thisform)
+        {
+        if (validate_required(text_user_name,'用户名不能为空')==false) 
+          {text_role_name.focus();return false}
+        else if (validate_required(text_user_name_chi,"用户中文名不能为空!")==false)
+          {text_role_desc.focus();return false}
+        else if (validate_required(text_user_pass,"密码不能为空!")==false)
+          {s_role_type.focus();return false}
+        else if (validate_required(text_email,"邮箱不能为空!")==false)
+          {s_belong_app.focus();return false}
+        else if (validate_required(s_role_default,"默认角色不能为空!")==false)
+          {s_product_dept.focus();return false}
+        else if (validate_required(s_product_dept_user,"部门不能为空!")==false)
+          {s_product_dept.focus();return false}
+        else
+          { return true}
+      }
+    }
+</script>
+
+
+    <script type="text/javascript">
+      $(function(){
+        // 添加角色
+        $("#btn_add_role").click(function(e){
+
+
+                    if (validate_form_role(add_role_form)==true)
+                    {
+                    
+                        e.preventDefault();
+                        var str_role_name = $("#text_role_name").val();                        
+                        var str_role_desc = $("#text_role_desc").val();
+                        var s_role_type = $("#s_role_type").val();
+                        var s_belong_app = $("#s_belong_app").val();
+                        var s_product_dept = $("#s_product_dept").val();
+
+                        $.ajax({
+                            url: "{{ url_for('admin.add_role') }}",
+                            type:"POST",
+                            //dataType: "text",
+                            dataType: "json",
+                            data: {"str_role_name":str_role_name,
+                                "str_role_desc":str_role_desc,
+                                "s_role_type":s_role_type,
+                                "s_belong_app":s_belong_app,
+                                "s_product_dept":s_product_dept
+                                },
+                            success:function(data){
+
+                              alert('添加成功！');
+
+                              var x = document.getElementById("s_role_default");
+
+                              $.each(data.new_role_list, function(i, n) {
+                                  
+                                    var tr = "<tr class='success'><td>"
+                                          + n.role_id +
+                                        "</td><td>"
+                                          + n.role_name_en +
+                                        "</td><td>"
+                                          + n.role_name_cn +
+                                        "</td><td>"
+                                          + n.role_type +
+                                        "</td><td>"
+                                          + n.app_info +
+                                        "</td><td>"
+                                          + n.plat_info +
+                                        "</td><td>"
+                                          + n.priority +
+                                        "</td><td>"
+                                          + n.create_date +
+                                        "</td></tr>";  
+
+                                    //$("#log_tbody").prepend(tr);//向table行首追加tr
+                                    $("#role_tbody").append(tr);//向table行首追加tr
+                                    
+                                    //引用时 .  和#的区别 .按class来引用 ，#按id来引用, 若都没有，是按类型来引用
+
+                                    // Mysql项目和角色映射 的Mysql 项目下拉列表添加新元素
+                                    var option = document.createElement("option"); 
+
+                                    option.text = n.role_name_en+"_"+n.role_name_cn;
+                                    option.value = n.role_id;
+                                    x.appendChild(option);
+                                    
+                                    
+                                });
+
+                              
+                            
+                            }       
+                        })
+              } else {
+                e.preventDefault();
+              }
+        })
+        
+      })
+    </script>
+
+
+  
+    <script type="text/javascript">
+      $(function(){
+        // 添加用户
+        $("#btn_user_add").click(function(e){
+
+              if (validate_form_user(add_user_form))
+
+                    {
+                    
+                        e.preventDefault();
+                        var s_user_name = $("#text_user_name").val();
+                        
+                        var s_user_name_cn = $("#text_user_name_chi").val();
+
+                        var s_user_pass = $("#text_user_pass").val();
+
+                        var s_role_default= $("#s_role_default").val();
+
+                        var s_email = $("#text_email").val();
+
+                        var s_dept = $("#s_product_dept_user").val();
+
+                        $.ajax({
+                            url: "{{ url_for('admin.add_user') }}",
+                            type:"POST",
+                            //dataType: "text",
+                            dataType: "json",
+                            data: {"s_user_name":s_user_name,
+                                "s_user_name_cn":s_user_name_cn,
+                                "s_user_pass":s_user_pass,
+                                "s_role_default":s_role_default,
+                                "s_email":s_email,
+                                "s_dept":s_dept
+                                },
+                            success:function(data){
+
+                              alert('用户添加成功！');
+
+                              //var x = document.getElementById("s_user_list");
+
+                              $.each(data.new_user_list, function(i, n) {
+                                    
+                                    
+                                    var tr = "<tr class='success'><td>"
+                                          + n.user_id +
+                                        "</td><td>"
+                                          + n.user_name_en +
+                                        "</td><td>"
+                                          + n.user_name_cn + 
+                                        "</td><td>"
+                                          + n.dept_name  +
+                                        "</td><td>"
+                                          + n.email  +
+                                        "</td><td>"
+                                          + n.default_role  +
+                                        "</td><td>"
+                                          + n.role_info  +
+                                        "</td><td>"
+                                          + n.create_date  +
+                                        "</td></tr>"; 
+
+                                    //$("#user_db_tbody").prepend(tr);//向table行首追加tr
+                                    $("#user_tbody").append(tr);//向table行末追加tr
+                                    
+                                    //引用时 .  和#的区别 .按class来引用 ，#按id来引用, 若都没有，是按类型来引用
+                                                                        
+                                });
+                            }       
+                        })
+              } else {
+                e.preventDefault();
+              }
+        })
+        
+      })
+    </script>
+
+    <script type="text/javascript">
+      $(function(){
+        // 添加用户
+        $("#txt_assign_user_name").blur(function(e){
+
+              if ($('#txt_assign_user_name').val()!="")
+                    {
+                    
+                        e.preventDefault();
+                        var s_assign_user_name = $("#txt_assign_user_name").val();
+
+                        $.ajax({
+                            url: "{{ url_for('admin.list_assign_role') }}",
+                            type:"POST",
+                            //dataType: "text",
+                            dataType: "json",
+                            data: {
+                              "s_assign_user_name":s_assign_user_name
+                                },
+                            success:function(data){
+                              //var x = document.getElementById("s_user_list");
+                              $('#s_assign_user_role').empty();
+                              $('#s_assign_user_role').append("<option value=''>选择角色</option>");
+                              var x = document.getElementById("s_assign_user_role");
+
+                              $.each(data.s_list_assign_role, function(i, n) {
+                                  
+                                    var option = document.createElement("option"); 
+
+                                    option.text = n.role_name_en+"_"+n.role_name_cn;
+                                    option.value = n.role_id;
+                                    x.appendChild(option);
+                                                                        
+                                });
+                            }       
+                        })
+              } else {
+                alert(' 请输入用户名! ');
+                //$('#txt_assign_user_name').focus();
+                e.preventDefault();
+              }
+        })
+        
+      })
+    </script>
+
+   <script type="text/javascript">
+      $(function(){
+        // 分配用户角色
+        $("#btn_assign_user_role").click(function(e){
+
+              if ($('#txt_assign_user_name').val()!="" && $('#s_assign_user_role').val()!="")
+                    {
+                    
+                        e.preventDefault();
+                        var s_assign_user_name = $("#txt_assign_user_name").val();
+                        var s_assign_user_role = $("#s_assign_user_role").val();
+                        $.ajax({
+                            url: "{{ url_for('admin.assign_user_role') }}",
+                            type:"POST",
+                            //dataType: "text",
+                            dataType: "json",
+                            data: {
+                              "s_assign_user_name":s_assign_user_name,
+                              "s_assign_user_role":s_assign_user_role
+                                },
+                            success:function(data){
+                              alert('角色分配成功');                                         
+                                }
+                            })  
+              } else {
+                alert(' 请输入用户名! ');
+                //$('#txt_assign_user_name').focus();
+                e.preventDefault();
+              }
+        })
+        
+      })
+    </script> 
+
+{% endblock %}
+

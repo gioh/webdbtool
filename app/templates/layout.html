@@ -1,0 +1,299 @@
+
+<!DOCTYPE html>
+<!-- saved from url=(0056)http://twitter.github.com/bootstrap/examples/fluid.html# -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <!--title>联友科技 Mysql DBA运维平台</title-->
+    <title>{% block page_title %}{% endblock %}</title>
+
+    
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <link href="../static/css/tipsy.css" rel="stylesheet" />
+    <link href="../static/css/sqlsyntax.css" rel="stylesheet" />
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+        width:100%;
+        min-width:1200px;
+      }
+      .row{
+        width:100%;
+      }
+
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+      .nav-sidebar li{
+        font-size:12px !important;
+      }
+      .nav-sidebar li a{
+        font-size:14px !important;
+      }
+
+      .container-fluid{
+        padding:0 !important;
+      }
+      .hero-unit{
+        font-size:14px !important;
+        padding:60px 15px 15px 15px !important;
+
+      }
+      .well{
+          padding:5px 5px !important;
+      }
+      .span2{
+        width:13% !important;
+        margin:0 1% !important;
+      }
+      .span10{
+          width:85% !important;
+          min-width:1000px;
+          margin-left:0 !important;
+      }
+      #log_redundant_keys td{
+            font-size:11px !important;
+      }
+      /*
+      input[type="text"].select-items{
+        display: none;
+      }
+      .fn-hide{
+        display: none;
+      }
+      */
+    </style>
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <link rel="stylesheet" href="../static/css/sidebar.css">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+     <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="../static/js/jigsaw.js"></script>
+    <!--script src="../static/js/jquery-1.91.js"></script>
+    <script src="../static/js/highstock.js"></script-->
+    
+    <script src="../static/js/bootstrap-transition.js"></script>
+    <script src="../static/js/bootstrap-alert.js"></script>
+    <script src="../static/js/bootstrap-modal.js"></script>
+    <script src="../static/js/bootstrap-dropdown.js"></script>
+    <script src="../static/js/bootstrap-scrollspy.js"></script>
+    <script src="../static/js/bootstrap-tab.js"></script>
+    <script src="../static/js/bootstrap-tooltip.js"></script>
+    <script src="../static/js/bootstrap-popover.js"></script>
+    <script src="../static/js/bootstrap-button.js"></script>
+    <script src="../static/js/bootstrap-collapse.js"></script>
+    <script src="../static/js/bootstrap-carousel.js"></script>
+    <script src="../static/js/bootstrap-typeahead.js"></script>
+
+    <!--script src="../static/js/happy.js"></script-->
+
+    <script src="../static/js/sidebar.js"></script>
+
+    
+    
+    
+
+    <!--script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script-->
+
+    <!--script src="http://code.highcharts.com/highcharts.js"></script-->
+
+
+    </head>
+
+  <body id="{% block page_id %}{% endblock %}">
+
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="{{ url_for('site.index') }}">联友科技 ORACLE DBA 自动化运维平台</a>
+          <div class="nav-collapse collapse">
+            <p class="navbar-text pull-right">
+               当前用户:{{ session['user_name_en'] }} &nbsp;
+               角色:<select id="current_role_list" name="current_role_list">
+                 <!--
+                 {% for item in role_list %}
+                    <option class="option-item" value="{{ item.role_id }}">{{ item.role_name_en }}</option>
+                 {% endfor %}
+                 -->
+                </select>&nbsp;
+               <a href="{{ url_for('site.login') }}" class="navbar-link">用户登录</a> &nbsp;
+               <a href="{{ url_for('site.logout') }}" class="navbar-link">用户注销</a>
+            </p>
+            <ul class="nav">
+              <li class="active"><a href="http://www.szlanyou.com/">联友科技</a></li>
+              <li><a href="{{ url_for('site.about') }}">关于</a></li>
+              
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="span2">
+          
+          <div id="sidebar" class="sidebar col-sm-3 col-md-2" style="height: 100%; overflow: hidden; width: 100%;">
+            <div class="sidebar-inner">
+              <div class="sidebar-header" style="padding: 20px 0px 15px 15px;
+                  font-weight: bold;
+                  font-size: 23px;" >目录菜单
+                <i class="sidebar-toggle fa fa-bars">
+                </i>
+              </div>
+              <ul class="nav nav-sidebar" style="display: block;">
+                
+                <li class="">
+                  <a data-toggle="collapse" data-parent="#sidebar" href="#" class="collapsed">
+                    <i class="fa fa-tasks" style="margin-right: 6px;">
+                    </i>
+                    OS Shell相关
+                  </a>
+                </li>
+                <li class="">
+                  <a data-toggle="collapse" data-parent="#sidebar" href="#" class="">
+                    <i class="fa fa-tasks" style="margin-right: 6px;">
+                    </i>
+                    数据库注册
+                  </a>
+                  <ul class="nav nav-sub collspse in" style="overflow: hidden; display: none;">
+                    <li class="">
+                      <a href="{{ url_for('db_register.db_register_show') }}">
+                        DB注册
+                      </a>
+                    </li>
+                    <i class="fa fa-caret-down">
+                    </i>
+                  </ul>
+                </li>
+                <li class="">
+                  <a data-toggle="collapse" data-parent="#sidebar" href="#" class="collapsed">
+                    <i class="fa fa-tasks" style="margin-right: 6px;">
+                    </i>
+                    DBA后台管理
+                  </a>
+                <ul class="nav nav-sub collspse in" style="overflow: hidden; display: none;">
+                    <li class="">
+                      <a href="{{ url_for('admin.admin_show') }}">
+                        角色用户管理
+                      </a>
+                    </li>
+                    <i class="fa fa-caret-down">
+                    </i>
+                  </ul>
+                </li>
+                
+                
+              </ul>
+            </div>
+          </div>
+
+        </div><!--/span-->
+        
+        <div class="span10">
+
+
+
+          <!--
+
+          {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              
+              {% for message in messages %}
+                
+                <script>alert({{ message|tojson|safe }});</script>
+
+                
+
+              {% endfor %}
+              
+            {% endif %}
+          {% endwith %}
+
+        -->
+       
+
+
+          {% block body %}{% endblock %}
+
+        </div><!--/span-->
+
+      </div><!--/row 最大的-->
+
+     
+    </div><!--/.fluid-container-->
+
+    <hr>
+
+    <script type="text/javascript">
+      $(document).ready(function () {
+        //current_user_id = {{session['user_id']}}
+        current_role_id =  ' {{ session['role_id'] }} ';
+        current_role_name =  '{{ session['role_name_en'] }}' ;
+            $.ajax({
+                url: "{{ url_for('site.init_role_list') }}",
+                type:"POST",
+                //dataType: "json",
+                dataType: "json",
+                data: {
+                    //"current_user_id":current_user_id                    
+                    },
+                success:function(data){
+                  //var str1="<option class='option-item' value='"+{{ session['role_id'] }}+"'>"+{{ session['role_name_en'] }}+"</option>"
+                  //$('#current_role_list').append(str1)
+                  document.getElementById("current_role_list").add(new Option(current_role_name,current_role_id))
+                  $.each(data.role_list, function(i, n) {
+                    var str2 = "<option class='option-item' value='"+n.role_id+"'>"+n.role_name_en+"</option>"
+                    //document.getElementById("current_role_list").add(new Option(n.role_id,n.role_name_en))
+                    $('#current_role_list').append(str2)
+                  })
+                   // alert('执行结果为: '+data);
+                }       
+            }) 
+
+         $('#current_role_list').on('change', function () {
+
+            value = $(this).val();
+                        
+            $.ajax({
+                url: "{{ url_for('site.switch_role') }}",
+                type:"POST",
+                //dataType: "json",
+                dataType: "json",
+                data: {
+                    "current_role":value                    
+                    },
+                success:function(data){
+                  if (data.switch_role_name) {alert(data.switch_role_name +" 角色切换成功 !")};
+                   // alert('执行结果为: '+data);
+                }       
+            })   
+                             
+          
+        });
+        
+        
+      })
+    </script>
+
+
+</body></html>
+
+

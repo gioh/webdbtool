@@ -1,0 +1,2 @@
+2015-06-12 15:50:55,048 ERROR: scp failure!! [in /home/apps/my_prog/my_dba_release/app/views/db_migrate.py:423]
+2015-06-12 15:50:55,349 INFO: insert into db_migrate_log(op_user,op_comment,from_ip,from_port,db_name,to_ip,to_port,result_type,result_output,job_id,table_list,to_db_name) values('dba','测试','172.26.136.82',3306,'newpqc','10.1.1.242',3307,0,"scp failure!!",213,'t_eap_sys_file','newpqc') [in /home/apps/my_prog/my_dba_release/app/views/db_migrate.py:450]

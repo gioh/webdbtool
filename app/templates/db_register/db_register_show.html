@@ -1,0 +1,550 @@
+{% extends "layout.html" %}
+{% block page_title %}DB Register{% endblock %}
+{% block body %}
+<!--link href="../../static/css/sqlsyntax.css" rel="stylesheet" /-->
+
+
+   <div class="hero-unit">
+      <div class="box" style="margin-top:-50px;">
+      <div class="header">DB显示</div>
+    <div class="row-fluid">
+     <div class="well">
+      <h5 style="display: inline-block;">已注册DB信息显示</h5>&nbsp;&nbsp;
+      <br>
+      DB类型:<select id="filter_db_type" name="filter_db_type"  class="select-container-db span2">
+                 <option class="option-item" value="0">选择环境</option>
+                 <option class="option-item" value="1">开发环境</option>
+                 <option class="option-item" value="2">业务测试环境</option>
+                 <option class="option-item" value="3">综合测试环境</option>
+                 <option class="option-item" value="4">功能测试环境</option>
+                 <option class="option-item" value="5">迁移环境</option>
+                 <option class="option-item" value="9">生产环境</option>
+
+                </select>&nbsp;&nbsp;
+      所属项目:&nbsp;<select id="app_list2" name="app_list2"  class="select-container-app_list2 span2">
+                 <option class="option-item" value="0">选择项目</option>
+                 {% for item in app_list2 %}
+                    <option class="option-item" value="{{ item.app_id }}">{{ item.app_name }}</option>
+                 {% endfor %}
+                 <!--option class="option-item" value="query0">请选择导数类型</option-->
+                 
+                </select>&nbsp;&nbsp;
+
+      IP:PORT:&nbsp;<input type="text" id="ipport_query" name="ipport_query" style="width:100px;" value="" placeholder="IP:PORT">&nbsp;&nbsp;
+
+      DB名称:<input type="text" id="db_name_query" name="db_name_query" style="width:80px;" value="" >&nbsp;&nbsp;
+    
+      <button type="submit" id="btn_query" class="btn btn-primary btn-small" >查询过滤</button>
+
+      <!--table class="table table-hover" style="word-break:break-all; word-wrap:break-all;"-->
+      <table id="t_db_inst_table" class="table table-hover" style="table-layout:fixed;">      
+        <thead>
+          <tr>
+            <th width="30">
+              ID
+            </th>
+            <th width="150">
+              IP:PORT
+            </th>
+            <th >
+              实例名称
+            </th>
+            <th >
+              DB名称
+            </th>
+            <th >
+              DB昵称
+            </th>
+            <th width="40">
+              集群
+            </th>
+            <th width="40">
+              INST_ID
+            </th>
+            <th width="60">
+              所属项目
+            </th>
+            <th width="60">
+              项目经理
+            </th>
+            <th >
+              生产部门
+            </th>
+            <th width="150">
+              create_time
+            </th> 
+          </tr>
+        </thead>
+        <tbody id="t_db_inst_table_body">
+          {% for item in db_register_list %}
+          <tr class="success">
+            <td >
+              {{ item.instance_id }}
+            </td>
+            <td >
+              {{ item.ipport }}
+            </td>
+            <td >
+              {{ item.instance_name }}
+            </td>
+            <td >
+              {{ item.db_name_en }}
+            </td>
+            <td >
+              {{ item.db_name_cn }}
+            </td>
+            <td >
+              {{ item.is_cluster }}
+            </td>
+            <td >
+              {{ item.inst_id }}
+            </td>
+            <td width="200">
+              {{ item.app_name }}
+            </td>
+            <td >
+              {{ item.app_manager }}
+            </td>
+            <td >
+              {{ item.plat_name }}
+            </td>
+            
+            <td >
+              {{ item.create_date }}
+            </td>
+          </tr>
+          {% endfor %}
+          
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+     <div class="header">DB注册</div>
+     </div>
+
+
+   		<form  id="form_db_register" method="post">
+
+                <legend><small>填写DB信息</small></legend>
+                <div id="db_inst_info" class="db_inst_info">
+                <div id="db_inst_info_0" class="db_inst_info_0">
+                IP :<input type="text" id="text_db_ip_0" name="text_db_ip_0"  class="text_db_ip"></input> 
+                端口 :<input type="text" id="text_db_port_0" name="text_db_port_0"  class="text_db_port"></input> 
+                ORACLE_SID :<input type="text" id="text_db_sid_0" name="text_db_sid_0"  class="text_db_sid"></input> 
+                <br>
+                OS帐号 :<input type="text" id="os_oracle_username" name="os_oracle_username"  class="os_oracle_username"></input> 
+                OS密码 :<input type="text" id="os_oracle_password" name="os_oracle_password"  class="os_oracle_password"></input> 
+                ORACLE帐号 :<input type="text" id="app_oracle_username" name="app_oracle_username"  class="app_oracle_username"></input> 
+                ORACLE密码 :<input type="text" id="app_oracle_password" name="app_oracle_password"  class="app_oracle_password"></input> 
+                </div>
+                </div>
+                DB昵称:<input type="text" id="text_db_niname" name="text_db_niname"  class="select-container-db span2"></input> &nbsp;&nbsp;&nbsp;
+                DB负责人:<input type="text" id="text_db_master" name="text_db_master"  class="select-container-db span2"></input> &nbsp;&nbsp;&nbsp;
+                DB类型:<select id="s_db_type" name="s_db_type"  class="select-container-setup_type span2" style='width:130px'>
+                 <option class="option-item" value="1">开发库</option>
+                 <option class="option-item" value="2">业务测试库</option>
+                 <option class="option-item" value="3">综合测试库</option>
+                 <option class="option-item" value="4">功能测试库</option>
+                 <option class="option-item" value="5">迁移库</option>
+                 <option class="option-item" value="9">生产库</option>
+                </select> &nbsp;&nbsp;
+                实例数量:<select id="s_db_inst_cnt" name="s_db_inst_cnt"  class="select-container-setup_type span2" style='width:130px'>
+                 <option class="option-item" value="1">1</option>
+                 <option class="option-item" value="2">2</option>
+                 <option class="option-item" value="3">3</option>
+                 <option class="option-item" value="4">4</option>
+                 <option class="option-item" value="5">5</option>
+                </select> &nbsp;&nbsp;
+                <div id="db_app_info" class="db_app_info">
+                所属项目:<select id="belong_app" name="belong_app"  class="select-container-app_master span2">
+                 <option class="option-item" value="0">选择项目</option>
+                 {% for item in app_list %}
+                    <option class="option-item" value="{{ item.app_id }}">{{ item.app_name }}</option>
+                 {% endfor %}
+                </select>&nbsp;&nbsp;&nbsp;&nbsp;
+
+                是否新项目: <input type="checkbox" id="is_new_app" name="is_new_app" class="select-container-db span2" onpropertychange="ShowNewapp()"> </input>
+                <div id="add_app_list" class="add_app_list">
+                项目名称: <input type="text" id="text_app_name" name="text_app_name"  class="select-container-db span2"></input> 
+                项目编码: <input type="text" id="text_app_code" name="text_app_code"  class="select-container-db span2"></input>
+                项目经理: <input type="text" id="text_app_manager" name="text_app_manager"  class="select-container-db span2"></input>
+                生产部门:
+                <select id="product_dept" name="product_dept"   style='width:150px;z-index:-1' >
+                 <option class="option-item" value="">选择部门</option>
+                 <option class="option-item" value="10000">数据部</option>
+                 <option class="option-item" value="10001">研发一部</option>
+                 <option class="option-item" value="10002">研发二部</option>
+                 <option class="option-item" value="10003">研发三部</option>
+                 <option class="option-item" value="10004">云服务部</option>
+                 <option class="option-item" value="10005">LITC</option>
+                </select>
+                </div>
+                </div>
+              
+        	   <button type="submit" id="btn_db_register" class="btn btn-primary btn-large">配置中心注册~</button>
+        </form>      
+   </div>
+
+    <div class="row-fluid">
+    <div class="well">
+      <h5 >执行结果输出</h5>
+     <pre id="sql_result_out_print" class="sql_result_out_print" style="color: red;">
+     </pre>
+    </div><!--/well-->
+   </div><!--/-fluid-->
+
+
+
+
+  <script>     
+    function writeSelect(obj){  
+        obj.options[0].selected = "select";  
+        obj.options[0].text = obj.options[0].text + String.fromCharCode(event.keyCode);  
+        event.returnValue=false;  
+        return obj.options[0].text;  
+    }  
+    </script> 
+
+   <script type="text/javascript">
+      $(document).ready(function () {
+        org_value = $('#s_db_inst_cnt').val();
+        $('#s_db_inst_cnt').on('change', function () {
+          now_value = $(this).val();
+          if (now_value >= org_value) {
+              for (var i = org_value ; i < now_value ; i++)
+              {
+
+                var newDiv = document.createElement('div');  
+                var str = "IP :<input type='text' id='text_db_ip_" + i + "' name='text_db_ip_" + i + "'/>端口 :<input type='text' id='text_db_port_" + i + "' name='text_db_port_" + i + "'/>ORACLE_SID :<input type='text' id='text_db_sid_" + i + "' name='text_db_sid_" + i+
+                  "'/><br>OS帐号 :<input type='text' id='os_oracle_username_" + i + "' name='os_oracle_username_" + i+
+                  "'/>OS密码 :<input type='text' id='os_oracle_password_" + i + "' name='os_oracle_password_" + i+
+                  "'/>ORACLE帐号 :<input type='text' id='app_oracle_username_" + i + "' name='os_oracle_password_" + i+
+                  "'/>ORACLE密码 :<input type='text' id='app_oracle_password_" + i + "' name='os_oracle_password_" + i+
+                "'/>"; 
+
+                newDiv.innerHTML = str;  
+                newDiv.setAttribute("Id", "db_inst_info_" + i);  
+                $("#db_inst_info").append(newDiv);  
+                org_value++;
+                //alert(org_value);
+                }                  
+          }
+        else{
+            rg_cnt = org_value - now_value;
+            for (var i = 1 ; i <= rg_cnt; i++){
+              $("#db_inst_info>div:last-child").remove();
+              org_value--;
+              //alert(org_value);
+            }
+        }
+        });
+        
+        
+      })
+    </script>
+
+    <script language="javascript">
+     $(document).ready(function(){
+      $("#add_app_list").hide();
+      $("#is_new_app").change(function() { 
+        if ($('#is_new_app').is(':checked') ){$("#add_app_list").show();}
+        else {$("#add_app_list").hide();}
+      
+      }); 
+      });  
+    </Script>
+
+
+    <script type="text/javascript">
+
+      function validate_required(field,alerttxt)
+      {
+      with (field)
+        {
+        if (value==null||value=="")
+          {alert(alerttxt);return false}
+        else {return true}
+        }
+      }
+    </script>
+
+    <script type="text/javascript">
+      function validate_form(thisform)
+      {
+      with (thisform)
+        {
+        if (validate_required(text_db_ip_0,"必须输入实例IP!")==false) 
+          {text_db_ip_0.focus();return false}
+        else if (validate_required(text_db_port_0,"必须输入实例端口!")==false)
+          {text_db_port_0.focus();return false}
+        else if (validate_required(text_db_sid_0,"必须输入实例SID!")==false)
+          {text_db_sid_0.focus();return false}
+        else if (validate_required(os_oracle_username,"必须输入OS帐号!")==false)
+          {text_db_sid_0.focus();return false}
+        else if (validate_required(os_oracle_password,"必须输入OS密码!")==false)
+          {text_db_sid_0.focus();return false}
+        else if (validate_required(app_oracle_username,"必须输入ORACLE帐号!")==false)
+          {text_db_sid_0.focus();return false}
+        else if (validate_required(app_oracle_password,"必须输入ORACLE密码!")==false)
+          {text_db_sid_0.focus();return false}
+        else if (validate_required(text_db_niname,"必须输入DB简称!")==false)
+          {text_db_niname.focus();return false}
+        else if (validate_required(text_db_master,"必须输入DB负责人!")==false)
+          {text_db_master.focus();return false}
+        else if (validate_required(text_db_master,"必须输入DB负责人!")==false)
+          {text_db_master.focus();return false}
+        else if($('#is_new_app').is(':checked')==true) {
+          if (validate_required(text_app_name,"必须输入项目名称!")==false) 
+              {text_app_name.focus();return false}
+          else if(validate_required(text_app_code,"必须输入项目代码!")==false) 
+              {text_app_code.focus();return false}
+          else if(validate_required(text_app_manager,"必须输入项目负责人!")==false) 
+              {text_app_manager.focus();return false}
+          else {return true} 
+        }
+        else if($('#is_new_app').is(':checked')==false){
+          if ($("#belong_app").val()==0) 
+            {alert('请选择所属项目!');return false}
+          //else {return true}}
+        else if ($("#s_db_type").val()==0) 
+          {alert('请选择DB类型!');return false}
+        else if ($("#s_db_inst_cnt").val()==0) 
+          {alert('请选择DB实例数量!');return false}
+        else
+          { return true}
+        }
+      }
+    }
+
+    </script>
+
+
+
+    <script type="text/javascript">
+      $(function(){
+        $("#btn_db_register").click(function(e){
+                    
+                    if (validate_form(form_db_register)==true)
+                     
+                    {   
+                        e.preventDefault();
+                        var text_db_ip = $("#text_db_ip_0").val();                      
+                        var text_db_port = $("#text_db_port_0").val();                      
+                        var text_db_sid = $("#text_db_sid_0").val();
+                        var os_oracle_username = $("#os_oracle_username").val();
+                        var os_oracle_password = $("#os_oracle_password").val();
+                        var app_oracle_username = $("#app_oracle_username").val();
+                        var app_oracle_password = $("#app_oracle_password").val();
+                        var text_db_niname = $("#text_db_niname").val();
+                        var text_db_master = $("#text_db_master").val();                        
+                        var s_db_type = $("#s_db_type").val();
+                        var s_db_inst_cnt = $("#s_db_inst_cnt").val();                        
+                        var belong_app = $("#belong_app").val();
+                        var text_app_name = $("#text_app_name").val();                       
+                        var text_app_code = $("#text_app_code").val();
+                        var text_app_manager = $("#text_app_manager").val();
+                        var product_dept = $("#product_dept").val();
+                        var is_new_app = 0;
+
+                        if($('#is_new_app').is(':checked')){ is_new_app = 1;}
+
+                        $.ajax({
+                            url: "{{ url_for('db_register.register_execute_cmd') }}",
+                            type:"POST",
+                            //dataType: "text",
+                            dataType: "json",
+                            data: {
+                                "text_db_ip":text_db_ip,
+                                "text_db_port":text_db_port,
+                                "text_db_sid":text_db_sid,
+                                "text_db_niname":text_db_niname,
+                                "text_db_master":text_db_master,
+                                "s_db_type":s_db_type,
+                                "s_db_inst_cnt":s_db_inst_cnt,
+                                "belong_app":belong_app,
+                                "text_app_name":text_app_name,
+                                "text_app_code":text_app_code,
+                                "text_app_manager":text_app_manager,
+                                "product_dept":product_dept,
+                                "is_new_app":is_new_app,
+                                "os_oracle_username":os_oracle_username,
+                                "os_oracle_password":os_oracle_password,
+                                "app_oracle_username":app_oracle_username,
+                                "app_oracle_password":app_oracle_password
+                                },
+                            success:function(data){
+                              if(data.list_add_db == ''){
+                                alert("注册失败！");
+                              }
+                              $.each(data.list_add_db, function(i, n) {
+                                    
+                                    //alert(n.db_ip);
+                                    alert("注册完毕！");
+
+                                    $('.sql_result_out_print').text("注册完毕！");
+                                    var tr = "<tr class='success'><td>"
+                                          + n.instance_id +
+                                        "</td><td>"
+                                          + n.ipport + 
+                                        "</td><td>"
+                                          + n.instance_name +
+                                        "</td><td>"
+                                          + n.db_name_en +
+                                        "</td><td>"
+                                          + n.db_name_cn +
+                                        "</td><td>"
+                                          + n.is_cluster +
+                                        "</td><td>"
+                                          + n.inst_id +
+                                        "</td><td >"
+                                          + n.app_name +
+                                        "</td><td >" 
+                                          + n.app_manager +
+                                        "</td><td >" 
+                                          + n.plat_name +
+                                        "</td><td >" 
+                                          + n.create_date 
+                                        "</td></tr>";  
+
+                                    $("#t_db_inst_table").prepend(tr);//向table行首追加tr
+                                    //引用时 .  和#的区别 .按class来引用 ，#按id来引用, 若都没有，是按类型来引用                                        
+                                });
+                              //$("#btn_db_register").attr("disabled", false);                           
+                            },
+                            //如果url处理失败
+                            error:function(xhr,state,err){
+                              //if(data.list_add_db==""){}
+                              $.each(data.list_add_db, function(i, n) {
+                              alert("注册失败！"); 
+                              $('.sql_result_out_print').text("注册失败！");
+                              })     
+                            }
+                        }) 
+                    }else {
+                        e.preventDefault();
+                    }
+        })  
+      })
+    </script>
+
+    <script type="text/javascript">
+    function validate_form_query()
+      {
+      
+
+        if ($("#filter_db_type").val()==0 && $("#app_list2").val()==0 && $("#db_name_query").val()=='' && $("#ipport_query").val()=='') 
+          
+          {alert('请输入查询条件后，再点击查询按钮!!');return false}
+       
+        else
+          { return true}
+        }
+      
+
+    </script>
+
+    <script type="text/javascript">
+      $(function(){
+        $("#btn_query").click(function(e){
+                               
+                    if (validate_form_query()==true)
+                      // 验证失败应该终止提交，但却提交了
+                    {                           
+                        e.preventDefault();
+                        //var ps_op_type = $("#ps_op_type").val()
+                        var filter_db_type = $("#filter_db_type").val();
+                        var app_list2 = $("#app_list2").val();
+                        var db_name_query = $("#db_name_query").val();
+                        var ipport_query = $("#ipport_query").val();
+
+                        if (ipport_query!='') 
+                          { 
+                            if (ipport_query.indexOf(":") < 0 ) 
+
+                            {
+                                ipport_query = ipport_query + ":1521"
+                            }
+                            // endsWith 判断结尾是某个字符, JS 函数名区分大小写
+                            else if( ipport_query.endsWith(":") )  
+                            {  
+                                ipport_query = ipport_query + "1521"
+                            }
+                            else
+                            {}
+                            //alert(ipport_query);
+                          }
+
+                        
+                        //$("#btn_query").attr("disabled", true);
+
+                        setTimeout(function () {
+
+                          $.ajax({
+                              url: "{{ url_for('db_register.db_list_get_query') }}",
+                              timeout: 60000,  // 60*60*24*1000 one day
+                              type:"POST",
+                              //dataType: "text",
+                              dataType: "json",
+                              data: {
+                                  //"ps_op_type":ps_op_type,
+                                  "db_type":filter_db_type,
+                                  "app_list2":app_list2,
+                                  "db_name_query":db_name_query,
+                                  "ipport_query":ipport_query
+                                  },
+                              success:function(data){
+
+                                //alert('!!');
+
+                                $("#t_db_inst_table_body").empty();
+
+                                $.each(data.db_list, function(i, n) {
+                                      
+                                     var tr = "<tr class='success'><td>"
+                                          + n.instance_id +
+                                        "</td><td>"
+                                          + n.ipport + 
+                                        "</td><td>"
+                                          + n.instance_name +
+                                        "</td><td>"
+                                          + n.db_name_en +
+                                        "</td><td>"
+                                          + n.db_name_cn +
+                                        "</td><td>"
+                                          + n.is_cluster +
+                                        "</td><td>"
+                                          + n.inst_id +
+                                        "</td><td >"
+                                          + n.app_name +
+                                        "</td><td >" 
+                                          + n.app_manager +
+                                        "</td><td >" 
+                                          + n.plat_name +
+                                        "</td><td >" 
+                                          + n.create_date 
+                                        "</td></tr>";  
+
+                                      $("#t_db_inst_table_body").prepend(tr);//向table行首追加tr
+                                      //引用时 .  和#的区别 .按class来引用 ，#按id来引用, 若都没有，是按类型来引用                                          
+                                  });
+
+                              $("#btn_query").attr("disabled", false);
+
+                              }       
+                          })
+
+                      }, 5000)
+
+              } else {
+                e.preventDefault();
+              }
+        })
+        
+      })
+    </script>
+
+    
+
+{% endblock %}
+

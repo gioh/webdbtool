@@ -1,0 +1,696 @@
+{% extends "layout.html" %}
+{% block page_title %}Mysql server Install{% endblock %}
+{% block body %}
+
+<!--link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"-->
+<link rel="stylesheet" href="../../static/css/jquery-ui.css">
+<!-- <link href="../../static/css/tipsy.css" rel="stylesheet" />
+<link href="../../static/css/sqlsyntax.css" rel="stylesheet" /> -->
+<!--script src="//code.jquery.com/jquery-1.9.1.js"></script-->
+<!--script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script-->
+<script src="../../static/js/jquery-ui.js"></script>
+<!--link rel="stylesheet" href="http://jqueryui.com/resources/demos/style.css"-->
+<style>
+.ui-progressbar {
+  position: relative;
+}
+.progress-label {
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  font-weight: bold;
+  text-shadow: 1px 1px 0 #fff;
+}
+.job_cur_status_desc {
+  color: blue;
+  padding: 20px 0;
+}
+.job_cur_shell_desc {
+  color: blue;
+  padding: 20px 0;
+}
+</style>
+    
+   
+   <div class="hero-unit">
+      <div class="box" style="margin-top:-50px;">
+     <div class="header">Mysql Server 安装</div>
+     </div>
+      <!--<
+      div style="margin-left:0px;margin-top:-50px;background-color:#FFEFA8;color:#844600;"><p>Mysql Server 安装</p></div>
+      -->    <!--#867D6A  -->
+
+   		<h5>请分别选择DB Server IP, 所属项目, DB实例角色描述，端口，Mysql版本，安装类型等，并执行~</h5>
+      <!--h5>注: 对PXC集群，在选择主从的过程中，已经自动完成了集群复制关系，不需要再去手工搭建主从了~</h5-->
+   		<form  id="form_db_install" method="post">
+
+                <legend><small>DB安装选项选择及录入</small></legend>
+
+                IP:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="server_ip" name="server_ip" style="width:130px;" placeholder="192.168.30...">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+                所属项目:&nbsp;&nbsp;&nbsp;&nbsp;<select id="app_list" name="app_list"  class="select-container-app_source span2">
+                 <option class="option-item" value="0">选择项目</option>
+                 {% for item in app_list %}
+                    <option class="option-item" value="{{ item.id }}">{{ item.name }}</option>
+                 {% endfor %}
+                 <!--option class="option-item" value="query0">请选择导数类型</option-->
+                 
+                </select>&nbsp;&nbsp;
+
+                DB实例角色描述:&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="role_desc" name="role_desc" style="width:150px;" placeholder="例如:商城DB(主)">&nbsp;&nbsp;<br>
+
+                端口:<select id="server_port" name="server_port"  class="select-container-server_source span2">
+                 <option class="option-item" value="3306">3306</option>
+                 <option class="option-item" value="3307">3307</option>
+                 <option class="option-item" value="3308">3308</option>
+                 <option class="option-item" value="3309">3309</option>
+                 <option class="option-item" value="3310">3310</option>
+                 <option class="option-item" value="3311">3311</option>
+              
+                </select>&nbsp;&nbsp;
+
+                Mysql版本:&nbsp;&nbsp;<select id="mysql_version" name="mysql_version"  class="select-container-db span2">
+                 <option class="option-item" value="6">Percona5.6</option>
+                 <option class="option-item" value="5">Mariadb10</option>
+                 <option class="option-item" value="4">Mariadb5</option>
+                 <option class="option-item" value="1">Mysql5</option>
+      
+                 
+                </select>&nbsp;&nbsp;
+
+                安装类型:&nbsp;&nbsp;<select id="mysql_ins_type" name="mysql_ins_type"  class="select-container-db span3">
+                 <option class="option-item" value="3">镜像安装模式,第一次安装</option>
+                 <option class="option-item" value="4">镜像安装模式,追加端口实例</option>
+                 <option class="option-item" value="1">云服务器初始化全新安装</option>
+                 <option class="option-item" value="2">云服务器启动新端口实例</option>               
+                </select>&nbsp;&nbsp;<br>
+
+
+                主/从<select id="m_s_type" name="m_s_type"  class="select-container-db span2">
+                 <option class="option-item" value="1">Master</option>
+                 <option class="option-item" value="0">Slave</option>
+                                  
+                </select>&nbsp;&nbsp;(二级从也算slave,也就是read_only的设置) &nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                实例负责人:&nbsp;&nbsp;&nbsp;<input type="text" id="instance_owner" name="instance_owner" style="width:140px;" value="张记任" >&nbsp;&nbsp;&nbsp;&nbsp;
+
+                <br>
+
+                应用连接数据库类型:&nbsp;&nbsp;<select id="prog_type" name="prog_type"  class="select-container-db span2">
+                 <option class="option-item" value="2">长连接</option>
+                 <option class="option-item" value="1">短连接</option>
+                 
+                 <!-- wait_timeout=120,28800 -->
+                 
+                </select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+                Innodb_Buffer_Pool大小(G):&nbsp;&nbsp;&nbsp;<input type="text" id="bp_size" name="bp_size" style="width:150px;" placeholder=""> G&nbsp;&nbsp;
+
+                <legend><small>DB Server信息显示（Mysqld占用端口，内存 CPU硬件配置)</small></legend>
+
+
+                <pre id="server_check_result" class="server_check_result" style="color: red;">
+      
+                </pre>
+
+                <legend><small></small></legend>
+
+               
+                <span style="display: inline-block;" class="select-item8">
+                操作备注:&nbsp;&nbsp;
+                <textarea id="op_comment" name="op_comment" style="width:465px; height:40px;" placeholder="操作备注(什么原因执行此操作)"></textarea><br>
+                
+                </span>
+                <span style="display: inline-block;" >
+        	   &nbsp;&nbsp;&nbsp;&nbsp;<button type="submit" id="btn_check" class="btn btn-primary btn-large">安装预检查~</button>&nbsp;&nbsp;
+             <button type="submit" id="btn_install" class="btn btn-primary btn-large" disabled="disabled"  >执行安装~</button> </span>
+        </form>
+      
+   </div>
+
+   <div id="progressbar"><div class="progress-label">执行进度...</div></div>
+   
+   <!--pre id="job_cur_status_desc" class="job_cur_status_desc" style="color: blue;"-->
+   <div id="job_cur_status_desc" class="job_cur_status_desc">执行进度:</div>
+   <div id="job_cur_shell_desc" class="job_cur_shell_desc">当前shell:</div>
+   
+   <div class="row-fluid">
+    <div class="well">
+      <h5>执行结果输出</h5>
+     <pre id="sql_result_out_print" class="sql_result_out_print" style="color: red;">
+      
+     </pre>
+
+    </div><!--/well-->
+   </div><!--/-fluid-->
+
+   <div class="row-fluid">
+     <div class="well">
+      
+      <h5 style="display: inline-block;">Mysql实例列表清单</h5>
+      &nbsp;&nbsp;&nbsp;
+      <!--form  id="form_query" method="post"-->
+      环境类型:<select id="domain_type" name="domain_type"  class="select-container-db span2">
+                 <option class="option-item" value="0">选择环境</option>
+                 <option class="option-item" value="1">开发环境</option>
+                 <option class="option-item" value="2">业务测试环境</option>
+                 <option class="option-item" value="5">综合测试环境</option>
+                 <option class="option-item" value="3">生产环境</option>
+                 <option class="option-item" value="4">功能验证环境</option>
+                 
+                </select>&nbsp;&nbsp;
+
+      所属项目:&nbsp;&nbsp;<select id="app_list2" name="app_list2"  class="select-container-app_list2 span2">
+                 <option class="option-item" value="0">选择项目</option>
+                 {% for item in app_list2 %}
+                    <option class="option-item" value="{{ item.id }}">{{ item.name }}</option>
+                 {% endfor %}
+                 <!--option class="option-item" value="query0">请选择导数类型</option-->
+                 
+                </select>&nbsp;&nbsp;
+
+      Role(模糊查询):&nbsp;&nbsp;<input type="text" id="role_query" name="role_query" style="width:80px;" value="" >&nbsp;&nbsp;
+
+      IP:PORT:&nbsp;<input type="text" id="ipport_query" name="ipport_query" style="width:100px;" value="" placeholder="IP:PORT">&nbsp;&nbsp;&nbsp;
+      <button type="submit" id="btn_query" class="btn btn-primary btn-small" >查询过滤</button>
+      <!--/form-->
+
+      
+      <!--table class="table table-hover" style="word-break:break-all; word-wrap:break-all;"-->
+      <table id="tl_mysql_instance" class="table table-hover" style="table-layout:fixed;">
+        
+        <thead>
+          <tr>
+            <th>
+              ID
+            </th>
+            <th>
+              IP
+            </th>
+            <th>
+              PORT
+            </th>
+            <th>
+              ROLE
+            </th>
+            <th>
+              is_master
+            </th>
+            <th>
+              所属项目名称
+            </th>
+            <th>
+              Mysql版本
+            </th>
+            <th>
+              环境类型
+            </th>
+            <th>
+              创建时间
+            </th>
+          </tr>
+        </thead>
+        <tbody id="mysql_instance_tbody">
+          {% for item in mysql_instance_list %}
+          <tr class="success">
+            <td>
+              {{ item.id }}
+            </td>
+            <td>
+              {{ item.ip }}
+            </td>
+            <td>
+              {{ item.port }}
+            </td>
+            <td>
+              {{ item.role }}
+            </td>
+            <td>
+              {{ item.is_master }}
+            </td>
+            
+            <td>
+              {{ item.app_name }}
+            </td>
+            <td>
+              {{ item.mysql_version }}
+            </td>
+            <td>
+              {{ item.app_type }}
+            </td>
+            <td>
+              {{ item.create_time }}
+            </td>
+          </tr>
+          {% endfor %}
+          
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+   <script type="text/javascript">
+      $(document).ready(function () {
+        $('.select-container-app_source').on('change', function () {
+
+            value = $(this).val();
+
+            var server_ip = $("#server_ip").val();
+
+            //alert(server_ip);
+
+                        
+            $.ajax({
+                url: "{{ url_for('mysql_web_install.get_server_info') }}",
+                type:"POST",
+                //dataType: "json",
+                dataType: "text",
+                data: {
+                    "belong_app":value,
+                    "server_ip":server_ip
+                    
+                    },
+                success:function(data){
+                  
+                   // alert('执行结果为: '+data);
+
+                   $('#server_check_result').text(data);
+                }       
+            })   
+                             
+          
+        });
+        
+        
+      })
+    </script>
+
+    
+    <script type="text/javascript">
+
+      function validate_required(field,alerttxt)
+      {
+      with (field)
+        {
+        if (value==null||value=="")
+          {alert(alerttxt);return false}
+        else {return true}
+        }
+      }
+
+      function validate_form(thisform)
+      {
+      with (thisform)
+        {
+
+        if ($("#app_list").val()==0) 
+          {alert('请选择DB Server主机所属项目');return false}
+          
+        else if ($("#server_ip").val()=='') 
+          {alert('请输入DB Server IP！');return false}
+
+        else if ($("#role_desc").val()=='') 
+          {alert('请输入DB实例的角色描述');return false}
+          
+        else if ($("#bp_size").val()=='') 
+          {alert('请输入Innodb_Buffer_Pool大小');return false}
+
+        else if (validate_required(op_comment,"必须输入操作备注!")==false)
+          {op_comment.focus();return false}
+
+       
+        else
+          { return true}
+        }
+      }
+
+    </script>
+
+    <script type="text/javascript">
+      $(function(){
+        $("#btn_check").click(function(e){
+
+                e.preventDefault();
+                    
+                if (validate_form(form_db_install)==true)
+                  
+                {
+
+                  var mysql_ins_type = $("#mysql_ins_type").val();
+
+                  var server_port = $("#server_port").val();
+
+                  var server_check_result= $('#server_check_result').text();
+
+                  //alert(server_check_result);
+
+                  if (server_check_result.indexOf(server_port) >= 0 ) 
+                      {
+                        alert('你要启动的新端口上，mysql实例已经在运行，不能安装在此端口,请选择其他端口！');
+                      }
+
+                  else if(server_check_result.indexOf('bak_cnf_count:0') >= 0 ) 
+                  {
+                    alert('镜像apps目录没有copy到本机，不能执行安装!');
+                  }
+
+                  else
+                   {$("#btn_install").attr("disabled", false);
+                    alert('检查通过，请继续安装！');
+                   }
+
+                  
+
+              }
+        })
+        
+      })
+    </script>
+
+
+
+    <script type="text/javascript">
+      $(function(){
+        $("#btn_install").click(function(e){
+                    
+                     
+                    e.preventDefault();
+
+                    var server_ip = $("#server_ip").val();
+                    var app_list = $("#app_list").val();
+                    var role_desc = $("#role_desc").val();
+                    var server_port = $("#server_port").val();
+                    var mysql_version = $("#mysql_version").val();
+                    var mysql_ins_type = $("#mysql_ins_type").val();
+                    var m_s_type = $("#m_s_type").val();
+                    var prog_type = $("#prog_type").val();
+                    var bp_size = $("#bp_size").val();
+                    var op_comment = $("#op_comment").val();
+                    var instance_owner = $("#instance_owner").val();
+                    var v_job_id;
+
+                    // 初始化job ，返回job id
+                    
+                    $.ajax({  
+                         type:"post",//请求方式  
+                         url: "{{ url_for('mysql_web_install.initial_job') }}",  
+                        
+                         dataType:"text",//设置返回数据的格式 
+                         data: {
+                            "op_comment":op_comment,
+                            "mysql_ins_type":mysql_ins_type
+                            },  
+                         success:function(data){  
+
+                            v_job_id = data; //ajax内定义的变量，只能内部使用,需要在外面定义
+
+                            console.log('yes');
+
+                            start_progress(v_job_id);
+                            
+                        }
+                       
+                     });  
+                    
+                    
+                    $("#btn_install").attr("disabled", true);
+
+                    setTimeout(function () { 
+
+                      $.ajax({
+                          url: "{{ url_for('mysql_web_install.execute_install') }}",
+                          timeout: 86400000,  // 60*60*24*1000 one day
+                          type:"POST",
+                          //dataType: "text",
+                          dataType: "json",
+                          data: {
+                              "server_ip":server_ip,
+                              "app_list":app_list,
+                              "role_desc":role_desc,
+                              "server_port":server_port,
+                              "mysql_version":mysql_version,
+                              "mysql_ins_type":mysql_ins_type,
+                              "m_s_type":m_s_type,
+                              "prog_type":prog_type,
+                              "bp_size":bp_size,
+                              "op_comment":op_comment,
+                              "v_job_id":v_job_id,
+                              "instance_owner":instance_owner
+                              },
+                          success:function(data){
+
+                            //alert(data)
+
+                            //$('.sql_result_out_print').text(data);
+
+                            $.each(data.new_instance_list, function(i, n) {
+                                  
+                                  //alert(n.db_ip);
+                                  //alert(n.result_output);
+
+                                  $('.sql_result_out_print').text('执行成功!');
+                                  
+                                  
+                                  var tr = "<tr class='success'><td>"
+                                        + n.id +
+                                      "</td><td>"
+                                        + n.ip + 
+                                      "</td><td>"
+                                        + n.port +
+                                      "</td><td>"
+                                        + n.role +
+                                      "</td><td>"
+                                        + n.is_master +
+                                      "</td><td>"
+                                        + n.app_name +
+                                      "</td><td>"
+                                        + n.mysql_version +
+                                      "</td><td>"
+                                        + n.app_type +
+                                      "</td><td>"
+                                        + n.create_time +
+                                      "</td></tr>";  
+
+                                  $("#mysql_instance_tbody").prepend(tr);//向table行首追加tr
+                                  //引用时 .  和#的区别 .按class来引用 ，#按id来引用, 若都没有，是按类型来引用
+                                  
+                                  
+                              });
+
+                            
+                          $("#btn_install").attr("disabled", false);
+
+                          }       
+                      })
+                    
+                    }, 5000)
+        })
+        
+      })
+    </script>
+
+    <script type="text/javascript"> 
+
+    var progressbar = $( "#progressbar" ),
+          progressLabel = $( ".progress-label" );
+     
+    progressbar.progressbar({
+      value: false,
+      change: function() {
+        progressLabel.text( "执行进度: " + progressbar.progressbar( "value" ) + "%" );
+      },
+      complete: function() {
+        progressLabel.text( "完成！" );
+      }
+    });
+
+    </script>
+
+    <script type="text/javascript">
+
+    var timerId;  
+
+    function start_progress(v_job_id) {
+      //每隔1秒自动调用方法，实现进度条的实时更新 
+      timerId=window.setInterval(function() {
+        progress(v_job_id);
+      },1000);
+    } 
+
+    function progress(v_job_id){  
+          //使用JQuery从后台获取JSON格式的数据  
+
+          //console.log(v_job_id);
+
+          $.ajax({
+            url: "{{ url_for('mysql_web_install.get_job_status') }}",
+            timeout: 86400000,  // 60*60*24*1000 one day
+            type:"POST",
+            //dataType: "text",
+            dataType: "json",
+            data: {
+                "v_job_id":v_job_id
+                },
+            success:function(data){
+
+                //console.log('OKle!');
+
+                $.each(data.job_list, function(i, n) {
+
+                  if(n.cur_prog_com_rate>=100){  
+                     window.clearInterval(timerId);  
+                  }  
+
+                  console.log(n.cur_prog_com_rate);
+
+                  // progressbar.progressbar( "value", "当前:" + n.cur_cum_prog_desc + " 总进度: " +n.cur_prog_com_rate );
+
+                  // console.log("当前:" + n.cur_cum_prog_desc + " 总进度: " +n.cur_prog_com_rate);
+
+                  progressbar.progressbar( "value", n.cur_prog_com_rate );
+
+                  $('.job_cur_status_desc').text("执行进度:  " + n.cur_cum_prog_desc);
+                  $('.job_cur_shell_desc').text("shell cmd: " + n.cur_prog_shell_cmd);
+
+                });
+
+
+                  
+            },  
+            //请求出错的处理  
+            error:function(){  
+               window.clearInterval(timerId);  
+
+               console.log("请求出错");
+               
+            }  
+         });  
+      }  
+    </script>
+
+    <script type="text/javascript">
+    function validate_form_query()
+      {
+      
+
+        if ($("#domain_type").val()==0 && $("#app_list2").val()==0 && $("#role_query").val()=='' && $("#ipport_query").val()=='') 
+          
+          {alert('请输入查询条件后，再点击查询按钮!!');return false}
+       
+        else
+          { return true}
+        }
+      
+
+    </script>
+
+    <script type="text/javascript">
+      $(function(){
+        $("#btn_query").click(function(e){
+            
+                    
+                    if (validate_form_query()==true)
+                      // 验证失败应该终止提交，但却提交了
+                    {   
+                        
+                        e.preventDefault();
+                        //var ps_op_type = $("#ps_op_type").val()
+                        var domain_type = $("#domain_type").val();
+                        var app_list2 = $("#app_list2").val();
+                        var role_query = $("#role_query").val();
+                        var ipport_query = $("#ipport_query").val();
+
+                        if (ipport_query!='') 
+                          { 
+
+                            if (ipport_query.indexOf(":") < 0 ) 
+
+                            {
+
+                                ipport_query = ipport_query + ":3306"
+
+                            }
+
+                            // endsWith 判断结尾是某个字符, JS 函数名区分大小写
+                            else if( ipport_query.endsWith(":") )  
+                            {  
+                                ipport_query = ipport_query + "3306"
+                            }
+
+                            else
+                            {}
+
+                            //alert(ipport_query);
+
+                          }
+
+                        
+                        $("#btn_query").attr("disabled", true);
+
+                        setTimeout(function () {
+
+                          $.ajax({
+                              url: "{{ url_for('mysql_web_install.server_list_get_query') }}",
+                              timeout: 86400000,  // 60*60*24*1000 one day
+                              type:"POST",
+                              //dataType: "text",
+                              dataType: "json",
+                              data: {
+                                  //"ps_op_type":ps_op_type,
+                                  "domain_type":domain_type,
+                                  "app_list2":app_list2,
+                                  "role_query":role_query,
+                                  "ipport_query":ipport_query
+                                  },
+                              success:function(data){
+
+                                //alert('!!');
+
+                                $("#mysql_instance_tbody").empty();
+
+                                $.each(data.server_list, function(i, n) {
+                                      
+                                      var tr = "<tr class='success'><td>"
+                                        + n.id +
+                                      "</td><td>"
+                                        + n.ip + 
+                                      "</td><td>"
+                                        + n.port +
+                                      "</td><td>"
+                                        + n.role +
+                                      "</td><td>"
+                                        + n.is_master +
+                                      "</td><td>"
+                                        + n.app_name +
+                                      "</td><td>"
+                                        + n.mysql_version +
+                                      "</td><td>"
+                                        + n.app_type +
+                                      "</td><td>"
+                                        + n.create_time +
+                                      "</td></tr>";   
+
+                                      $("#mysql_instance_tbody").prepend(tr);//向table行首追加tr
+                                      //引用时 .  和#的区别 .按class来引用 ，#按id来引用, 若都没有，是按类型来引用
+                                      
+                                      
+                                  });
+
+                                
+                              $("#btn_query").attr("disabled", false);
+
+                              }       
+                          })
+
+                      }, 5000)
+
+              } else {
+                e.preventDefault();
+              }
+        })
+        
+      })
+    </script>
+
+{% endblock %}
+

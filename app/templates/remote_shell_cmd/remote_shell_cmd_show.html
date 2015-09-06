@@ -1,0 +1,193 @@
+{% extends "layout.html" %}
+{% block page_title %}DBA Remote Shell Cmd{% endblock %}
+{% block body %}
+
+   <div class="hero-unit">
+      <!-- <div style="margin-left:0px;margin-top:-50px;background-color:#FFEFA8;color:#844600;"><p>远程执行Shell命令 </p></div> -->  
+      <div class="box" style="margin-top:-50px;">
+     <div class="header">远程执行Shell命令</div>
+     </div>
+    
+   		<h5>请分别选择远程主机所属项目和远程主机IP，并输入要执行的shell命令， 并执行~</h5>
+   		<form  id="form_remote_shell_cmd" method="post" >
+
+               
+
+                远程主机所属项目:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<select id="app_list_target" name="app_list_target"  class="select-container-app_target span2">
+                 <option class="option-item" value="0">选择项目</option>
+                 {% for item in app_list_target %}
+
+                    <option class="option-item" value="{{ item.id }}">{{ item.name }}</option>
+                 {% endfor %}
+                 
+                 
+                </select>&nbsp;&nbsp;
+
+                远程主机:<select id="server_list_target" name="server_list_target"  class="select-container-server_target span4">
+                 <option class="option-item" value="0">选择主机</option>
+              
+                </select><br>
+
+                输入要执行的命令:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<textarea id="shell_cmd" name="shell_cmd" style="width:510px; height:50px;" placeholder="输入要执行的Shell命令"></textarea>
+
+               
+
+        	   <br><button type="submit" class="btn btn-primary btn-large">执行~</button>
+        </form>
+      
+   </div>
+
+   <div class="row-fluid">
+    <div class="well">
+      <h5>执行结果输出</h5>
+     <pre id="cmd_result_out_print" class="cmd_result_out_print" style="color: red;">
+      
+     </pre>
+
+    </div><!--/well-->
+   </div><!--/-fluid-->
+
+   
+
+   
+
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $('.select-container-app_target').on('change', function () {
+          value = $(this).val();
+          
+                        
+                        $.ajax({
+                            url: "{{ url_for('remote_shell_cmd.get_server_list') }}",
+                            type:"POST",
+                            dataType: "json",
+                            //dataType: "text",
+                            data: {
+                                "belong_app":value
+                                
+                                },
+                            success:function(data){
+                              
+                              $("#server_list_target").empty();
+
+                              var x = document.getElementById("server_list_target");
+                              var option = document.createElement("option"); 
+
+                              option.text = '选择主机';
+                              option.value = 0;
+                              x.appendChild(option);
+
+                              $.each(data.server_list, function(i, n) {
+                                    var optionTmp = document.createElement("option"); 
+                                    
+                                    
+                                    optionTmp.text = n.role + n.ip + ':' + n.port;
+                                    optionTmp.value = n.id;
+                                    x.appendChild(optionTmp);
+                                });
+                            }       
+                        })   
+                             
+          
+        });
+        
+        
+      })
+    </script>
+
+    
+
+    
+  
+    
+    <script type="text/javascript">
+
+      function validate_required(field,alerttxt)
+      {
+      with (field)
+        {
+        if (value==null||value=="")
+          {alert(alerttxt);return false}
+        else {return true}
+        }
+      }
+
+      function validate_form(thisform)
+      {
+      with (thisform)
+        {
+
+        if ($("#app_list_target").val()==0) 
+          {alert('请选择远程主机所属项目');return false}
+          
+        else if ($("#server_list_target").val()==0) 
+          {alert('请选择远程主机');return false}
+
+        
+        else if (validate_required(shell_cmd,"必须输入执行命令!")==false)
+         {shell_cmd.focus();return false}
+
+       
+        else
+          { return true}
+        }
+      }
+
+    </script>
+
+    <script type="text/javascript">
+      $(function(){
+        $(".btn").click(function(e){
+                    if (validate_form(form_remote_shell_cmd)==true)
+                      
+                    {
+                        e.preventDefault();
+                        var str_server_id = $("#server_list_target").val();
+                        
+                        var shell_cmd = $("#shell_cmd").val();
+
+                        $.ajax({
+                            url: "{{ url_for('remote_shell_cmd.execute_cmd') }}",
+                            type:"POST",
+                            dataType: "text",
+                            //dataType: "json",
+                            data: {"str_server_id":str_server_id,
+                                "shell_cmd":shell_cmd
+                                },
+                            success:function(data){
+
+                              alert('执行结果为: '+data);
+
+                              $('.cmd_result_out_print').text(data);
+
+                              // json
+                              //$.each(data.result, function(i, n) {
+                                    
+                                    
+                              //      alert(n);
+
+                              //      $('.cmd_result_out_print').text(n);
+                                    
+                                    
+                                   
+                                    
+                              //  });
+
+                              
+                            
+                            }       
+                        })
+              } else {
+                e.preventDefault();
+              }
+        })
+        
+      })
+    </script>
+
+
+
+    
+
+{% endblock %}
+
